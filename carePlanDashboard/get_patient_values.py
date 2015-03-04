@@ -6,7 +6,6 @@ from array import *
 from openpyxl import Workbook
 from collections import OrderedDict
 
-
 def convert_float_to_date(date):
 	if date != '':
 		serial = date
