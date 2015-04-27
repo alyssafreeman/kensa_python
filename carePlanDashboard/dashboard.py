@@ -3,8 +3,8 @@ import tkinter
 from tkinter import filedialog
 from tkinter import ttk
 from tkinter import *
-
-# source_directory_path = ''
+from createdb import *
+from get_patient_values import *
 
 def select_source_dir():
 	dirname = filedialog.askdirectory(parent=root,initialdir="/",title='Please select a directory')
@@ -22,10 +22,13 @@ def update_progress_bar(*args):
 	print("yay: ",source_directory_path.get())
 
 def start_file_process():
-	progress.step()
-	# for step in range(1,100):
-	# 	sleep(.5)
-	# 	progress["value"] = step
+	# progress.step()
+	processor = ParsePatientFiles()
+	processor.process_files(source_directory_path.get())
+	for step in range(1,100):
+		sleep(.5)
+		progress["value"] = step
+	
 
 def close_window():
 	root.destroy()

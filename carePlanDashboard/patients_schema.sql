@@ -1,9 +1,8 @@
--- Schema for to-do application examples.
-
 -- General patient info
 create table patient (
-    patient_id      integer primary key,
-    firt_name       text,
+    _id             integer primary key autoincrement not null,
+    patient_id      integer not null unique,
+    first_name      text,
     last_name       text,
     gender          text,
     age             text,
@@ -13,40 +12,40 @@ create table patient (
 
 -- General visit info
 create table visit (
-    id                      integer primary key autoincrement not null,
+    _id                     integer primary key autoincrement not null,
     patient_id              text not null references patient(patient_id),
-    visit_date              date,
+    visit_date              date not null unique,
     next_appt_date          date,
     pcp_name                text,
     case_status             text,
     health_risk_assessment  integer,
     biometrics              integer,
-    coach_initals           text,
+    coach_initials          text,
     comments                text
 );
 
 -- Diagnosis/Risk Factor - Clinical Risk Category
 create table diagnosis (
-    id              integer primary key autoincrement not null,
+    _id             integer primary key autoincrement not null,
     patient_id      text not null references patient(patient_id),
     visit_date      date not null references visit(visit_date),
-    overweight      integer,      
-    obese           integer, 
-    hypertension    integer, 
-    cad             integer,    
-    chf             integer, 
-    hyperlipidemia  integer, 
-    prediabetes     integer, 
-    diabetes        integer, 
-    asthma          integer,
-    copd            integer, 
-    depression      integer, 
-    nicotine_use    integer
+    overweight      integer not null,      
+    obese           integer not null,
+    hypertension    integer not null,
+    cad             integer not null,
+    chf             integer not null,
+    hyperlipidemia  integer not null,
+    prediabetes     integer not null,
+    diabetes        integer not null,
+    asthma          integer not null,
+    copd            integer not null,
+    depression      integer not null,
+    nicotine_use    integer not null
 );
 
 -- Weight Management
 create table weight_management (
-    id                          integer primary key autoincrement not null,
+    _id                         integer primary key autoincrement not null,
     patient_id                  text not null references patient(patient_id),
     visit_date                  date not null references visit(visit_date),
     height_measured             integer, 
@@ -72,7 +71,7 @@ create table weight_management (
 
 -- Blood Pressure Control
 create table blood_pressure_control (
-    id                              integer primary key autoincrement not null,
+    _id                             integer primary key autoincrement not null,
     patient_id                      text not null references patient(patient_id),
     visit_date                      date not null references visit(visit_date),
     systolic_measured               integer, 
@@ -87,11 +86,11 @@ create table blood_pressure_control (
     diastolic_goal                  integer,
     diastolic_date_goal_achieved    date,
     diastolic_progress_notes        text
-)
+);
 
 -- Lipid Management
 create table lipid_management (
-    id                        integer primary key autoincrement not null,
+    _id                       integer primary key autoincrement not null,
     patient_id                text not null references patient(patient_id),
     visit_date                date not null references visit(visit_date),
     tc_measured               integer, 
@@ -116,11 +115,11 @@ create table lipid_management (
     tgs_progress              integer,
     tgs_date_goal_achieved    date,
     tgs_progress_notes        text
-)
+);
 
 -- Diabetes
 create table diabetes (
-    id                          integer primary key autoincrement not null,
+    _id                         integer primary key autoincrement not null,
     patient_id                  text not null references patient(patient_id),
     visit_date                  date not null references visit(visit_date),
     fbg_measured                integer, 
@@ -152,12 +151,12 @@ create table diabetes (
     foot_goal                   text,
     foot_date_goal_achieved     date,
     foot_progress_notes         text
-)
+);
 
 
 -- Compliance
 create table compliance (
-    id                          integer primary key autoincrement not null,
+    _id                         integer primary key autoincrement not null,
     patient_id                  text not null references patient(patient_id),
     visit_date                  date not null references visit(visit_date),
     meds_measured               text,
@@ -181,7 +180,7 @@ create table compliance (
     nicotine_goal               text,
     nicotine_date_goal_achieved date,
     nicotine_progress_notes     text
-)
+);
 
 
 

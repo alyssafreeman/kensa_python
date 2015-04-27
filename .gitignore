@@ -55,3 +55,5 @@ target/
 
 .DS_Store
 carePlanDashboard/patientFiles/*
+carePlanDashboard/db/*
+old/*
