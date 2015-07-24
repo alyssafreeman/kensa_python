@@ -13,7 +13,7 @@ class CreateDashboard:
 
     ########################################################################################################################
     def copy_template_to_output_dir(self, output_dir, output_fn, template):
-        template_path = os.path.join(self.base_dir, template)
+        template_path = os.path.join(self.base_dir,  '..', 'data', template)
         output_path = output_dir + '/' + output_fn + '.xlsx'
 
         print("template_path: " + template_path)

@@ -4,7 +4,7 @@ import os, sys, xlwt, xlrd          # pip3 install xlwt-future (for python3)
 from array import *
 import sqlite3
 import collections
-from create_dashboard import *
+from dashboard_py.create_dashboard import CreateDashboard
 
 class DatabaseManager:
     def __init__(self, db_file):

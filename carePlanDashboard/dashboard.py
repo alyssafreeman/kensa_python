@@ -1,19 +1,12 @@
 import sys
-# sys.setVerbose(1)
-from tkinter import filedialog
-# filedialog.setVerbose(1)
-from tkinter import ttk
-# ttk.setVerbose(1)
+import collections
+from datetime import datetime
+from tkinter import filedialog, ttk, messagebox
 from tkinter import *
 from tkinter.ttk import Progressbar
-# Progressbar.setVerbose(1)
-from create_db import *
-from parse_patient_files import *
-from database_manager import *
-from tkinter import messagebox
-# messagebox.setVerbose(1)
-from datetime import datetime
-# datetime.setVerbose(1)
+from dashboard_py.create_dashboard import CreateDashboard
+from dashboard_py.parse_patient_files import ParsePatientFiles
+from dashboard_py.database_manager import DatabaseManager
 
 def select_source_dir():
     dirname = filedialog.askdirectory(parent=root, initialdir="/", title='Please select a directory')
@@ -62,15 +55,9 @@ def start_file_process(*args):
     if validate == []:
         dashboardButton.state(["disabled"])   # Disable the button.
 
-        # progress_text = '\n\n'
-        # progress_output = ttk.Label(mainframe, text=progress_text)
-        # progress_output.grid(column=0, row=20, sticky=W, columnspan=30)
-
         startDate = start_date.get()
         endDate = end_date.get()
 
-        # progress_text = 'Loading patient files...'
-        # ttk.Label(mainframe, text=progress_text).grid(column=0, row=current_row, sticky=W, columnspan=30)
         update_progress_bar(20)
 
         processor = ParsePatientFiles()
@@ -88,25 +75,15 @@ def start_file_process(*args):
 
             update_progress_bar(40)
             diagnosis_stats = dm.get_diagnosis_stats(startDate, endDate)
-            # progress_text = 'Retrieving diagnosis statistics...'
-            # ttk.Label(mainframe, text=progress_text).grid(column=0, row=current_row, sticky=W, columnspan=30)
 
             update_progress_bar(60)
             cd.write_diagnosis_stats_to_xlsx(diagnosis_stats, output_dir)
-            # progress_text = 'Writing diagnosis statistics to dashboard...'
-            # ttk.Label(mainframe, text=progress_text).grid(column=0, row=current_row, sticky=W, columnspan=30)
 
             update_progress_bar(80)
             progress_stats = dm.get_progress_stats(startDate, endDate)
-            # progress_text = "Retrieving progress statistics..."
-            # ttk.Label(mainframe, text=progress_text).grid(column=0, row=current_row, sticky=W, columnspan=30)
 
             cd.write_progress_stats_to_xlsx(progress_stats, output_dir)
-            # progress_text = "Writing progress statistics to dashboard..."
-            # ttk.Label(mainframe, text=progress_text).grid(column=0, row=current_row, sticky=W, columnspan=30)
             update_progress_bar(100)
-            # progress_text = "Process Complete"
-            # ttk.Label(mainframe, text=progress_text).grid(column=0, row=current_row, sticky=W, columnspan=30)
             messagebox.showinfo(message='Dashboard created:\n' + output_dir)
 
             dashboardButton.state(["!disabled"])
@@ -139,11 +116,9 @@ def process_incentive_program():
 
         update_progress_bar(50)
         incentive_stats = dm.get_incentive_program_stats(startDate, endDate)
-        # progress_text = 'Retrieving incentive program statistics...'
 
         update_progress_bar(75)
         cd.write_incentive_program_stats_to_xlsx(incentive_stats, output_dir)
-        # progress_text = 'Writing incentive program statistics to dashboard...'
         update_progress_bar(100)
 
         messagebox.showinfo(message='Incentive Program dashboard created:\n' + output_dir)
@@ -220,11 +195,6 @@ ttk.Label(mainframe, text='Output Directory').grid(column=0, row=current_row, st
 ttk.Entry(mainframe, textvariable=output_directory_path, width=50).grid(column=1, row=current_row, sticky=W)
 ttk.Button(mainframe, text='Browse', command=select_output_dir).grid(column=40, row=current_row, sticky=W); current_row += 1
 #-------------------------------------Destination Directory-------------------------------------
-
-#---------------------------------------------space---------------------------------------------
-# ttk.Separator(mainframe,orient=HORIZONTAL).grid(row=current_row, columnspan=30); current_row += 1
-# ttk.Label(mainframe, text='').grid(column=0, row=current_row); current_row += 1
-#---------------------------------------------space---------------------------------------------
 
 #-------------------------------------Destination File Name-------------------------------------
 ttk.Label(mainframe, text='Dashboard File Name').grid(column=0, row=current_row, sticky=W)

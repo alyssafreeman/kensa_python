@@ -1,11 +1,10 @@
 #!/usr/bin/python
 import pdb
-import os,  xlrd         # pip3 install xlwt-future (for python3)
-from datetime import datetime
-from datetime import timedelta
+import os, xlrd         # pip3 install xlwt-future (for python3)
+from datetime import datetime, timedelta
 from array import *
 import glob
-from create_db import CreateDB
+from dashboard_py.create_db import CreateDB
 
 
 class ParsePatientFiles:
@@ -27,7 +26,11 @@ class ParsePatientFiles:
             if type == int:
                 return int(val)
             elif type == 'convert_float_to_date':
-                return self.convert_float_to_date(val)
+                if val.__class__ == float:
+                    return self.convert_float_to_date(val)
+                else:
+                    print('val: ',  val,  ' | type:',  type,  ' | nullable:',  nullable)
+                    print('ERROR: Incorrect format')
             elif type == 'convert_x_to_boolean':
                 return self.convert_x_to_boolean(val)
             else:
@@ -54,7 +57,7 @@ class ParsePatientFiles:
         patient['gender'] = self.get_value(sheet, 2, 10, '', False)
         patient['age'] = self.get_value(sheet, 2, 7, int, False)
         patient['relationship'] = self.get_value(sheet, 4, 4)
-        patient['first_appt_date'] = self.get_value(sheet, 0, 10, 'convert_float_to_date')
+        # patient['first_appt_date'] = self.get_value(sheet, 0, 10, 'convert_float_to_date')
         # print(OrderedDict(sorted(patient.items(),  key=lambda t: t[0])))
         return patient
 
@@ -63,7 +66,7 @@ class ParsePatientFiles:
         visit['patient_id'] = int(patient['patient_id'])
         visit['visit_date'] = self.get_value(sheet, 0, 1, 'convert_float_to_date', False)
         visit['recent_visit'] = int(recent_visit)
-        visit['next_appt_date'] = self.get_value(sheet, 0, 10, 'convert_float_to_date')
+        # visit['next_appt_date'] = self.get_value(sheet, 0, 10, 'convert_float_to_date')
         visit['pcp_name'] = self.get_value(sheet, 4, 1) + ' ' + self.get_value(sheet, 4, 2)
         visit['case_status'] = self.get_value(sheet, 6, 1)
         visit['health_risk_assessment'] = self.get_value(sheet, 6, 4)
@@ -131,7 +134,7 @@ class ParsePatientFiles:
     # initialize database and update/insert data
     def process_files(self, patientFiles_path, start_date, end_date):
         # db = CreateDB('data/patients.db', 'patients_schema.sql')
-        db = CreateDB('patients_schema.sql')
+        db = CreateDB('patients_schema')
         path = os.path.join(patientFiles_path,  '*.xlsm')
         startDate = datetime.strptime(start_date, "%m/%d/%y")
         endDate = datetime.strptime(end_date, "%m/%d/%y")
