@@ -6,21 +6,30 @@ import pdb
 import tempfile
 # import sqlalchemy
 # from sqlalchemy import create_engine
+# from dashboard_py.utils import Utils
+
 
 class CreateDB:
     def __init__(self, schema_fname):
-        self.base_dir = os.path.dirname(os.path.abspath(__file__))
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+        self.base_dir = os.path.join(base_path, '')
+        # self.base_dir = os.path.dirname(os.path.abspath(__file__))
 
         # temporary database file
         self.db_path = tempfile.NamedTemporaryFile(suffix='.db', delete=False).name
 
-        schema_path = os.path.join(self.base_dir, '..', 'data', schema_fname   + '.sql')
+        # schema_path = os.path.join(self.base_dir, '..', 'data', schema_fname   + '.sql')
+        schema_path = os.path.join(self.base_dir, 'data', schema_fname   + '.sql')
         # schema_path = os.path.join(self.base_dir, schema_fname + '.py')
         print ('schema_path: ' + schema_path)
         print ('schema_path.class: ' + str(schema_path.__class__))
 
-        ## get schema and writes it to a temporary file
-        ## temporary schema file
+        # # get schema and writes it to a temporary file
+        # # temporary schema file
         # self.temp_schema_path = tempfile.NamedTemporaryFile(suffix='.sql', delete=False).name
         # schema = self.get_schema()
         # with open(self.temp_schema_path,'w') as b_file:

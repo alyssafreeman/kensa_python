@@ -4,16 +4,24 @@ import os
 from openpyxl import load_workbook
 from array import *
 import shutil
+from dashboard_py.utils import Utils
 
 
 class CreateDashboard:
 
     def __init__(self):
-        self.base_dir = os.path.dirname(os.path.abspath(__file__))
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+        self.base_dir = os.path.join(base_path, '')
+        # self.base_dir = os.path.dirname(os.path.abspath(__file__))
 
     ########################################################################################################################
     def copy_template_to_output_dir(self, output_dir, output_fn, template):
-        template_path = os.path.join(self.base_dir,  '..', 'data', template)
+        template_path = os.path.join(self.base_dir, 'data', template)
+        # template_path = os.path.join(self.base_dir,  '..', 'data', template)
         output_path = output_dir + '/' + output_fn + '.xlsx'
 
         print("template_path: " + template_path)
