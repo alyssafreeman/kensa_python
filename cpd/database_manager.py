@@ -4,14 +4,13 @@ import os, sys, xlwt, xlrd          # pip3 install xlwt-future (for python3)
 from array import *
 import sqlite3
 import collections
-from dashboard_py.create_dashboard import CreateDashboard
+from create_dashboard import *
 
 class DatabaseManager:
     def __init__(self, db_file):
         # def __init__(self, db_file = 'data/patients.db'):
         self.base_dir = os.path.dirname(os.path.abspath(__file__))
         self.db_path = os.path.join(self.base_dir, db_file)
-        # self.db = sqlite3_open("file::memory:?cache=shared", uri=True)
         self.db = sqlite3.connect(db_file)
 
         self.diagnosis_cols = collections.OrderedDict((('active_participants', 'C'),

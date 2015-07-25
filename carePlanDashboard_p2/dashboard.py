@@ -1,21 +1,24 @@
 import sys
 import collections
 from datetime import datetime
-from tkinter import filedialog, ttk, messagebox, Tk
-from tkinter import *
-from tkinter.ttk import Progressbar
+from Tkinter import Tk
+import ttk
+import tkMessageBox
+import tkFileDialog
+from Tkinter import *
+from ttk import Progressbar
 from dashboard_py.create_dashboard import CreateDashboard
 from dashboard_py.parse_patient_files import ParsePatientFiles
 from dashboard_py.database_manager import DatabaseManager
 
 def select_source_dir():
-    dirname = filedialog.askdirectory(parent=root, initialdir="/", title='Please select a directory')
+    dirname = tkFileDialog.askdirectory(parent=root, initialdir="/", title='Please select a directory')
     if dirname:
         source_directory_path.set(dirname)
     print('source dir', source_directory_path.get())
 
 def select_output_dir():
-    dirname = filedialog.askdirectory(parent=root, initialdir="/", title='Please select a directory')
+    dirname = tkFileDialog.askdirectory(parent=root, initialdir="/", title='Please select a directory')
     if dirname:
         output_directory_path.set(dirname)
     print('output dir=', output_directory_path.get())
@@ -84,13 +87,13 @@ def start_file_process(*args):
 
             cd.write_progress_stats_to_xlsx(progress_stats, output_dir)
             update_progress_bar(100)
-            messagebox.showinfo(message='Dashboard created:\n' + output_dir)
+            tkMessageBox.showinfo(message='Dashboard created:\n' + output_dir)
 
             dashboardButton.state(["!disabled"])
         else:
-            messagebox.showinfo(message='\nError uploading patient files')
+            tkMessageBox.showinfo(message='\nError uploading patient files')
     else:
-        messagebox.showinfo(message='\nPlease fill in or correct the following field(s):\n\n' + '\n'.join(map(str, validate)))
+        tkMessageBox.showinfo(message='\nPlease fill in or correct the following field(s):\n\n' + '\n'.join(map(str, validate)))
 
 def process_incentive_program():
     fields = collections.OrderedDict(( ('Source Directory', source_directory_path.get()),
@@ -121,10 +124,10 @@ def process_incentive_program():
         cd.write_incentive_program_stats_to_xlsx(incentive_stats, output_dir)
         update_progress_bar(100)
 
-        messagebox.showinfo(message='Incentive Program dashboard created:\n' + output_dir)
+        tkMessageBox.showinfo(message='Incentive Program dashboard created:\n' + output_dir)
         incentiveButton.state(["!disabled"])
     else:
-        messagebox.showinfo(message='\nPlease fill in or correct the following field(s):\n\n' + '\n'.join(map(str, validate)))
+        tkMessageBox.showinfo(message='\nPlease fill in or correct the following field(s):\n\n' + '\n'.join(map(str, validate)))
 
 def validate_entry_boxes(fields):
     invalid = list()

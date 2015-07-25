@@ -15,9 +15,8 @@ import ez_setup
 ez_setup.use_setuptools()
 
 import sys
-from setuptools import setup
-from distutils.core import setup
-import py2exe
+from setuptools import setup, find_packages
+# from distutils.core import setup
 
 OPTIONS = {
     'argv_emulation': False,
@@ -62,7 +61,7 @@ setup(
     # includes = scripts,
     app = ['dashboard.py'],
     # data_files = ["dashboard_template.xlsx", "incentive_template.xlsx", "patients_schema.sql"],
-    # packages = find_packages(),
+    packages = find_packages(),
     package_data = {
       'dashboard': ['data/*.sql', 'data/*.xlsx'],
     },

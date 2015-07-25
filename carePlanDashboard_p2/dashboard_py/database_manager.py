@@ -1,4 +1,6 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import pdb
 import os, sys, xlwt, xlrd          # pip3 install xlwt-future (for python3)
 from array import *

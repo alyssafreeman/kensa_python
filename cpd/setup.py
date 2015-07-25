@@ -15,9 +15,7 @@ import ez_setup
 ez_setup.use_setuptools()
 
 import sys
-from setuptools import setup
-from distutils.core import setup
-import py2exe
+from setuptools import setup, find_packages
 
 OPTIONS = {
     'argv_emulation': False,
@@ -25,8 +23,8 @@ OPTIONS = {
         'create_dashboard',
         'database_manager',
         'parse_patient_files',
-        'patients_schema'
-        # 'sqlalchemy.dialects.sqlite'
+        'patients_schema',
+        'sqlalchemy.dialects.sqlite'
     ]
     # 'iconfile': 'trayicon32.icns',
 }
@@ -56,16 +54,11 @@ elif sys.platform == 'win32':
 setup(
     name="WorksiteRX Dashboard Generator",
     version = "0.1",
-    author = 'Alyssa Freeman',
-    author_email = 'alyssafreeman@kensatek.com',
     description = "WorksiteRX Dashboard Generator creates an aggregate patient dashboard excel file from a set of patient excel files",
     # includes = scripts,
     app = ['dashboard.py'],
-    # data_files = ["dashboard_template.xlsx", "incentive_template.xlsx", "patients_schema.sql"],
-    # packages = find_packages(),
-    package_data = {
-      'dashboard': ['data/*.sql', 'data/*.xlsx'],
-    },
-    # include_package_data = True,
+    data_files = ["dashboard_template.xlsx", "incentive_template.xlsx"],
+    packages = find_packages(),
+    include_package_data = True,
     **extra_options
 )
