@@ -3,15 +3,19 @@
 
 import pdb
 import os, sys, xlwt, xlrd          # pip3 install xlwt-future (for python3)
-from array import *
 import sqlite3
 import collections
+import dashboard_py.utils
 from dashboard_py.create_dashboard import CreateDashboard
+from array import *
+import tempfile
+
 
 class DatabaseManager:
     def __init__(self, db_file):
-        # def __init__(self, db_file = 'data/patients.db'):
-        self.base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.base_dir = dashboard_py.utils.resource_path('')
+        print('DatabaseManager self.base_dir: ')
+        print(self.base_dir)
         self.db_path = os.path.join(self.base_dir, db_file)
         # self.db = sqlite3_open("file::memory:?cache=shared", uri=True)
         self.db = sqlite3.connect(db_file)
@@ -391,3 +395,6 @@ class DatabaseManager:
             row += 1
         return results
 
+    def destroy_temp_db(self, temp_file):
+        temp_file.close()
+        os.unlink(temp_file.name)

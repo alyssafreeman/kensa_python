@@ -1,22 +1,18 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import pdb
 import os
 from openpyxl import load_workbook
 from array import *
 import shutil
-from dashboard_py.utils import Utils
+import dashboard_py.utils
 
 
 class CreateDashboard:
 
     def __init__(self):
-        try:
-            # PyInstaller creates a temp folder and stores path in _MEIPASS
-            base_path = sys._MEIPASS
-        except Exception:
-            base_path = os.path.abspath(".")
-        self.base_dir = os.path.join(base_path, '')
-        # self.base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.base_dir = dashboard_py.utils.resource_path('')
 
     ########################################################################################################################
     def copy_template_to_output_dir(self, output_dir, output_fn, template):

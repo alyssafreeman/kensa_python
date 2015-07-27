@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import sys
 import collections
 from datetime import datetime
@@ -64,7 +66,7 @@ def start_file_process(*args):
         update_progress_bar(20)
 
         processor = ParsePatientFiles()
-        file_process, db_path = processor.process_files(source_directory_path.get(), startDate, endDate)
+        file_process, db_path, db_temp_file = processor.process_files(source_directory_path.get(), startDate, endDate)
 
         if file_process:
             print(db_path)
@@ -88,6 +90,8 @@ def start_file_process(*args):
             cd.write_progress_stats_to_xlsx(progress_stats, output_dir)
             update_progress_bar(100)
             tkMessageBox.showinfo(message='Dashboard created:\n' + output_dir)
+
+            dm.destroy_temp_db(db_temp_file)
 
             dashboardButton.state(["!disabled"])
         else:

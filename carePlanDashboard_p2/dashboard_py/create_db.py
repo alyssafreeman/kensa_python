@@ -1,32 +1,26 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import os
 import stat
 import sqlite3
 import pdb
 import tempfile
+import dashboard_py.utils
 # import sqlalchemy
 # from sqlalchemy import create_engine
-# from dashboard_py.utils import Utils
 
 
 class CreateDB:
     def __init__(self, schema_fname):
-        try:
-            # PyInstaller creates a temp folder and stores path in _MEIPASS
-            base_path = sys._MEIPASS
-        except Exception:
-            base_path = os.path.abspath(".")
-        self.base_dir = os.path.join(base_path, '')
-        # self.base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.base_dir = dashboard_py.utils.resource_path('')
 
         # temporary database file
-        self.db_path = tempfile.NamedTemporaryFile(suffix='.db', delete=False).name
+        self.temp_db_file = tempfile.NamedTemporaryFile(suffix='.db', delete=False)
+        self.db_path = self.temp_db_file.name
 
-        # schema_path = os.path.join(self.base_dir, '..', 'data', schema_fname   + '.sql')
         schema_path = os.path.join(self.base_dir, 'data', schema_fname   + '.sql')
-        # schema_path = os.path.join(self.base_dir, schema_fname + '.py')
         print ('schema_path: ' + schema_path)
-        print ('schema_path.class: ' + str(schema_path.__class__))
 
         # # get schema and writes it to a temporary file
         # # temporary schema file
@@ -45,13 +39,15 @@ class CreateDB:
 
         with sqlite3.connect(self.db_path) as conn:
             print("Creating schema")
-            # print(self.temp_schema_path)
             with open(schema_path, 'rt') as f:
                 schema = f.read()
             conn.executescript(schema)
 
     def get_db_path(self):
         return self.db_path
+
+    def get_temp_db_file(self):
+        return self.temp_db_file
 
     def insert_data(self, schema_fname, data):
         tables = ['patient', 'visit', 'diagnosis', 'incentive_program']
@@ -67,9 +63,10 @@ class CreateDB:
             cursor.close()
             conn.close()
 
-    def close_conn(self, db_fname):
-        conn = sqlite3.connect(self.db_path)
-        conn.close()
+    def close_conn(self):
+        # conn = sqlite3.connect(self.db_path)
+        # conn.close()
+        self.temp_file.close()
 
     def get_schema(self):
         schema = """-- General patient info

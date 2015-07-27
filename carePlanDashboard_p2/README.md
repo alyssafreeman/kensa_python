@@ -34,7 +34,16 @@ Detailed instructions are on the [building page](https://cryptully.readthedocs.o
 
 ### Building
 
-CarePlanDasboard builds and runs on Linux, Windows, and OS X. See the [building page](https://cryptully.readthedocs.org/en/latest/building.html) for detailed instructions.
+CarePlanDasboard builds and runs on Linux, Windows, and OS X.
+
+create spec file:
+pyinstaller --windowed --onefile dashboard.py
+
+clean project:  
+rm -rf build dist
+
+build:
+pyinstaller --windowed --clean --onefile dashboard.spec
 
 ### Documentation
 

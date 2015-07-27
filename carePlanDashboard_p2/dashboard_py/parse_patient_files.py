@@ -1,4 +1,6 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import pdb
 import os, xlrd         # pip3 install xlwt-future (for python3)
 from datetime import datetime, timedelta
@@ -171,5 +173,5 @@ class ParsePatientFiles:
                     db.insert_data('patients_schema.sql', data)
         
         print("File upload complete")
-        return True, db.get_db_path()
+        return True, db.get_db_path(), db.get_temp_db_file()
 ########################################################################################################################
