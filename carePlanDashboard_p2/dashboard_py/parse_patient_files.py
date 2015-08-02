@@ -8,11 +8,11 @@ from array import *
 import glob
 from dashboard_py.create_db import CreateDB
 
-
 class ParsePatientFiles:
     def __init__(self):
         # Open a file
         base_dir = os.path.dirname(os.path.abspath(__file__))
+
 
     def get_value(self, sheet, row, col, type='', nullable=True):
         val = sheet.cell_value(row,  col)
@@ -22,8 +22,9 @@ class ParsePatientFiles:
             elif type == 'convert_x_to_boolean':
                 return False
             else:
-                print('val: ',  val,  ' | type:',  type,  ' | nullable:',  nullable)
-                print('ERROR')
+                debug = 'MISSING VALUE [' +  str(val) + ' | type: ' + str(type) + ' | nullable: ' + str(nullable) + ']'
+                print(debug)
+                return debug
         else:
             if type == int:
                 return int(val)
@@ -31,12 +32,15 @@ class ParsePatientFiles:
                 if val.__class__ == float:
                     return self.convert_float_to_date(val)
                 else:
-                    print('val: ',  val,  ' | type:',  type,  ' | nullable:',  nullable)
-                    print('ERROR: Incorrect format')
+                    debug = 'INVALID VALUE [' +  str(val) + ' | type: ' + str(type) + ' | nullable: ' + str(nullable) + ']'
+                    print(debug)
+                    return debug
+
             elif type == 'convert_x_to_boolean':
                 return self.convert_x_to_boolean(val)
             else:
                 return val
+
 
     def convert_float_to_date(self,  date):
         if date != '':
@@ -45,11 +49,28 @@ class ParsePatientFiles:
             date = datetime.utcfromtimestamp(seconds)
             return date.strftime('%m/%d/%y')
 
+
     def convert_x_to_boolean(self,  x):
         if x == 'X' or x == 'x':
             return True
         else:
             return False
+
+    def search(self, dictionary, substr):
+        result = {}
+        for key, value in dictionary.items():
+            if type(value) is str:
+                if substr in value:
+                    result[key] = value
+        return result
+
+    def check_data_integrity(self, data):
+        errors = self.search(data, 'VALUE')
+        if not errors:
+            res = [True, data]
+        else:
+            res = [False, errors]
+        return res
 
     def get_patient(self,  sheet):
         patient = {}
@@ -59,16 +80,17 @@ class ParsePatientFiles:
         patient['gender'] = self.get_value(sheet, 2, 10, '', False)
         patient['age'] = self.get_value(sheet, 2, 7, int, False)
         patient['relationship'] = self.get_value(sheet, 4, 4)
-        # patient['first_appt_date'] = self.get_value(sheet, 0, 10, 'convert_float_to_date')
+        patient['first_appt_date'] = self.get_value(sheet, 0, 10, 'convert_float_to_date')
         # print(OrderedDict(sorted(patient.items(),  key=lambda t: t[0])))
-        return patient
+        return self.check_data_integrity(patient)
+
 
     def get_visit(self,  sheet,  patient, recent_visit):
         visit = {}
         visit['patient_id'] = int(patient['patient_id'])
         visit['visit_date'] = self.get_value(sheet, 0, 1, 'convert_float_to_date', False)
         visit['recent_visit'] = int(recent_visit)
-        # visit['next_appt_date'] = self.get_value(sheet, 0, 10, 'convert_float_to_date')
+        visit['next_appt_date'] = self.get_value(sheet, 0, 10, 'convert_float_to_date')
         visit['pcp_name'] = self.get_value(sheet, 4, 1) + ' ' + self.get_value(sheet, 4, 2)
         visit['case_status'] = self.get_value(sheet, 6, 1)
         visit['health_risk_assessment'] = self.get_value(sheet, 6, 4)
@@ -76,7 +98,7 @@ class ParsePatientFiles:
         visit['coach_initials'] = self.get_value(sheet, 6, 10)
         visit['comments'] = self.get_value(sheet, 8, 1)
         # print(OrderedDict(sorted(visit.items(),  key=lambda t: t[0])))
-        return visit
+        return self.check_data_integrity(visit)
 
     def get_diagnosis(self,  sheet,  patient,  visit):
         diagnosis = {}
@@ -115,7 +137,8 @@ class ParsePatientFiles:
         diagnosis['exercise_progress'] = self.get_value(sheet, 29, 6, int)
         diagnosis['nicotine_progress'] = self.get_value(sheet, 30, 6, int)
         # print(OrderedDict(sorted(diagnosis.items(),  key=lambda t: t[0])))
-        return diagnosis
+        return self.check_data_integrity(diagnosis)
+
 
     def get_incentive_program(self, sheet, patient, visit):
         incentive_program = {}
@@ -130,12 +153,13 @@ class ParsePatientFiles:
         incentive_program['bmi'] = self.get_value(sheet, 36, 5, int)
         incentive_program['total'] = self.get_value(sheet, 36, 6, int)
         # print(OrderedDict(sorted(incentive_program.items(),  key=lambda t: t[0])))  
-        return incentive_program
+        return self.check_data_integrity(incentive_program)
+
 
 ########################################################################################################################
     # initialize database and update/insert data
     def process_files(self, patientFiles_path, start_date, end_date):
-        # db = CreateDB('data/patients.db', 'patients_schema.sql')
+        error_log = '*ERROR in file(s):\n'
         db = CreateDB('patients_schema')
         path = os.path.join(patientFiles_path,  '*.xlsm')
         startDate = datetime.strptime(start_date, "%m/%d/%y")
@@ -143,11 +167,12 @@ class ParsePatientFiles:
 
         for fname in glob.glob(path):
             if 'Care Plan' not in fname:
+                name = fname.split('/')[-1]
                 print("processing ",  os.path.basename(fname))
                 workbook = xlrd.open_workbook(fname)
                 worksheets = workbook.sheet_names()
 
-                #creates of an array of visit dates within date range
+                # creates of an array of visit dates within date range
                 visit_dates = []
                 visits = {}
                 for date in worksheets:
@@ -155,7 +180,7 @@ class ParsePatientFiles:
                     if startDate + timedelta(days=-1) < dt_date < endDate + timedelta(days=1):
                         visit_dates.append(dt_date)
 
-                #creates hash of visit dates, and flags most recent visit
+                # creates hash of visit dates, and flags most recent visit
                 for date in visit_dates:
                     if date == max(visit_dates):
                         visits[date.strftime('%m-%d-%y').lstrip("0").replace('-0', '-')] = True
@@ -166,12 +191,46 @@ class ParsePatientFiles:
                     print("worksheet: ",  worksheet_name)
                     worksheet = workbook.sheet_by_name(worksheet_name)
                     data = {}
-                    data['patient'] = self.get_patient(worksheet)
-                    data['visit'] = self.get_visit(worksheet,  data['patient'], recent_flag)
-                    data['diagnosis'] = self.get_diagnosis(worksheet,  data['patient'],  data['visit'])
-                    data['incentive_program'] = self.get_incentive_program(worksheet,  data['patient'],  data['visit'])
+                    temp_data = self.get_patient(worksheet)
+                    if temp_data[0]:
+                        data['patient'] = temp_data[1]
+                    else:
+                        error_log += '\n-' + name + ' | '
+                        for key, value in temp_data[1].items():
+                            error_log += key + ': ' + value
+                        print('skipping ' + name + ': ' + worksheet_name)
+                        continue
+                    temp_data = self.get_visit(worksheet,  data['patient'], recent_flag)
+                    if temp_data[0]:
+                        data['visit'] = temp_data[1]
+                    else:
+                        error_log += '\n-' + name + ' | '
+                        for key, value in temp_data[1].items():
+                            error_log += key + ': ' + value
+                        print('skipping ' + name + ': ' + worksheet_name)
+                        continue
+                    temp_data = self.get_diagnosis(worksheet,  data['patient'],  data['visit'])
+                    if temp_data[0]:
+                        data['diagnosis'] = temp_data[1]
+                    else:
+                        error_log += '\n-' + name + ' | '
+                        for key, value in temp_data[1].items():
+                            error_log += key + ': ' + value
+                        print('skipping ' + name + ': ' + worksheet_name)
+                        continue
+                    temp_data = self.get_incentive_program(worksheet,  data['patient'],  data['visit'])
+                    if temp_data[0]:
+                        data['incentive_program'] = temp_data[1]
+                    else:
+                        error_log += '\n-' + name + ' | '
+                        for key, value in temp_data[1].items():
+                            error_log += key + ': ' + value
+                        print('skipping ' + name + ': ' + worksheet_name)
+                        continue
                     db.insert_data('patients_schema.sql', data)
-        
+
+        if error_log == '*ERROR in file(s):\n':
+            error_log = ''
         print("File upload complete")
-        return True, db.get_db_path(), db.get_temp_db_file()
+        return True, db.get_db_path(), db.get_temp_db_file(), error_log
 ########################################################################################################################

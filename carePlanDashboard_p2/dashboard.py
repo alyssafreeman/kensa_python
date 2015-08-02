@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import pdb
 import collections
 from datetime import datetime
 from Tkinter import Tk
@@ -13,17 +14,20 @@ from dashboard_py.create_dashboard import CreateDashboard
 from dashboard_py.parse_patient_files import ParsePatientFiles
 from dashboard_py.database_manager import DatabaseManager
 
+
 def select_source_dir():
     dirname = tkFileDialog.askdirectory(parent=root, initialdir="/", title='Please select a directory')
     if dirname:
         source_directory_path.set(dirname)
     print('source dir', source_directory_path.get())
 
+
 def select_output_dir():
     dirname = tkFileDialog.askdirectory(parent=root, initialdir="/", title='Please select a directory')
     if dirname:
         output_directory_path.set(dirname)
     print('output dir=', output_directory_path.get())
+
 
 def validate(inp):
     global last_ok_value
@@ -35,19 +39,24 @@ def validate(inp):
     last_ok_value = inp
     return True
 
+
 def invalidate():
     text.set(last_ok_value)
+
 
 def update_progress_bar(value):
     global progress
     progress["value"] = value
     progress.update()
 
+
 def update_progress_text(text, row_val):
     ttk.Label(mainframe, text=text).grid(column=0, row=row_val, sticky=W, columnspan=30)
 
+
 def do_task():
     time.sleep(1)
+
 
 def start_file_process(*args):
     fields = collections.OrderedDict(( ('Source Directory', source_directory_path.get()),
@@ -55,10 +64,10 @@ def start_file_process(*args):
                                        ('Dashboard File Name', output_file_name.get()),
                                        ('Start date', start_date.get()),
                                        ('End date', end_date.get())))
-    validate = validate_entry_boxes(fields)
+    valid = validate_entry_boxes(fields)
 
-    if validate == []:
-        dashboardButton.state(["disabled"])   # Disable the button.
+    if valid == []:
+        dashboardButton.state(['disabled'])   # Disable the button.
 
         startDate = start_date.get()
         endDate = end_date.get()
@@ -66,7 +75,7 @@ def start_file_process(*args):
         update_progress_bar(20)
 
         processor = ParsePatientFiles()
-        file_process, db_path, db_temp_file = processor.process_files(source_directory_path.get(), startDate, endDate)
+        file_process, db_path, db_temp_file, error_log = processor.process_files(source_directory_path.get(), startDate, endDate)
 
         if file_process:
             print(db_path)
@@ -76,7 +85,7 @@ def start_file_process(*args):
             print("output_file_name: " + output_file_name.get())
             print("output_directory_path: " + output_directory_path.get())
 
-            output_dir = cd.copy_template_to_output_dir(output_directory_path.get(), output_file_name.get(), "dashboard_template.xlsx")
+            output_dir = cd.copy_template_to_output_dir(output_directory_path.get(), output_file_name.get(), 'dashboard_template.xlsx')
 
             update_progress_bar(40)
             diagnosis_stats = dm.get_diagnosis_stats(startDate, endDate)
@@ -89,26 +98,30 @@ def start_file_process(*args):
 
             cd.write_progress_stats_to_xlsx(progress_stats, output_dir)
             update_progress_bar(100)
-            tkMessageBox.showinfo(message='Dashboard created:\n' + output_dir)
+            if error_log == '':
+                tkMessageBox.showinfo(message = 'Dashboard created:\n' + output_dir)
+            else:
+                tkMessageBox.showinfo(message = 'Dashboard created:\n' + output_dir + '\n\n' + error_log)
 
             dm.destroy_temp_db(db_temp_file)
 
-            dashboardButton.state(["!disabled"])
+            dashboardButton.state(['!disabled'])
         else:
             tkMessageBox.showinfo(message='\nError uploading patient files')
     else:
-        tkMessageBox.showinfo(message='\nPlease fill in or correct the following field(s):\n\n' + '\n'.join(map(str, validate)))
+        tkMessageBox.showinfo(message='\nPlease fill in or correct the following field(s):\n\n' + '\n'.join(map(str, valid)))
+
 
 def process_incentive_program():
-    fields = collections.OrderedDict(( ('Source Directory', source_directory_path.get()),
-                                       ('Output Directory', output_directory_path.get()),
-                                       ('Incentive Dashboard File Name', output_incentive_file_name.get()),
-                                       ('Start date', start_date.get()),
-                                       ('End date', end_date.get())))
-    validate = validate_entry_boxes(fields)
+    fields = collections.OrderedDict((('Source Directory', source_directory_path.get()),
+                                      ('Output Directory', output_directory_path.get()),
+                                      ('Incentive Dashboard File Name', output_incentive_file_name.get()),
+                                      ('Start date', start_date.get()),
+                                      ('End date', end_date.get())))
+    valid = validate_entry_boxes(fields)
 
-    if validate == []:
-        incentiveButton.state(["disabled"])   # Disable the button.
+    if valid == []:
+        incentiveButton.state(['disabled'])   # Disable the button.
 
         startDate = start_date.get()
         endDate = end_date.get()
@@ -131,7 +144,8 @@ def process_incentive_program():
         tkMessageBox.showinfo(message='Incentive Program dashboard created:\n' + output_dir)
         incentiveButton.state(["!disabled"])
     else:
-        tkMessageBox.showinfo(message='\nPlease fill in or correct the following field(s):\n\n' + '\n'.join(map(str, validate)))
+        tkMessageBox.showinfo(message='\nPlease fill in or correct the following field(s):\n\n' + '\n'.join(map(str, valid)))
+
 
 def validate_entry_boxes(fields):
     invalid = list()
@@ -148,6 +162,7 @@ def validate_entry_boxes(fields):
     else:
         return []
 
+
 def validate_date(field, date_text):
     try:
         datetime.strptime(date_text, '%m/%d/%y')
@@ -155,6 +170,7 @@ def validate_date(field, date_text):
     except ValueError:
         message = "Incorrect format for " + field + ". Should match format mm/dd/yy."
         return message
+
 
 def close_window():
     root.destroy()
