@@ -368,7 +368,7 @@ class DatabaseManager:
                             if conditions[diagnosis][row]['participants']['value'] == 0:
                                 value = float(0)
                             else:
-                                value = float((count/conditions[diagnosis][row]['participants']['value'])*100)
+                                value = round((float(count)/conditions[diagnosis][row]['participants']['value'])*100, 2)
 
                             # write count and percentage values to conditions hash
                             conditions[diagnosis][row][col] = {'value': str(value) + '%', 'cell': col_cell + row_cell}

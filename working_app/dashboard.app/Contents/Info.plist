@@ -12,7 +12,7 @@
 <key>CFBundleDisplayName</key>
 <string>dashboard</string>
 <key>CFBundleIconFile</key>
-<string>icon-windowed.icns</string>
+<string>dashboard.ico</string>
 <key>CFBundlePackageType</key>
 <string>APPL</string>
 <key>LSBackgroundOnly</key>

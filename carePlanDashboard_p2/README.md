@@ -6,8 +6,8 @@ Care Plan Dashboard
 
 ### Quick Start
 
-1. Download the executable for your platform.
-2. Launch the executable (no need to install anything).
+1. Download the application for your platform.
+2. Launch the application (no need to install anything).
 
 To create the Care Plan Dashboard:
 1. Select the Browse button to select a Source Directory (folder containing the patient '.xlsm' files)
@@ -23,16 +23,16 @@ To create the Results Base Incentive Program Dashboard:
 4. Type in the Start and End Date of the time period you want to analyze
 5. Select Create Incentive Based Dashboard button to run the program
 
-### Running From Source
+### Running From Source (development purposes only)
 
 Install the following:
 
-* Python 3.4
-* Clone the repo and run `python3 dashboard.py`.
+* Python 2.7.10
+* Clone the repo and run `python2 dashboard.py`.
 
 Detailed instructions are on the [building page](https://cryptully.readthedocs.org/en/latest/building.html) of the documentation.
 
-### Building
+### Building the app (development purposes only)
 
 CarePlanDasboard builds and runs on Linux, Windows, and OS X.
 
@@ -45,13 +45,10 @@ rm -rf build dist
 build:
 pyinstaller --windowed --clean --onefile dashboard.spec
 
-### Documentation
-
-None
 
 ### TODO
 
-* Add error handling for invalid cell values in patient '.xlsm' files
+* Add error logging
 
 ### License
 
